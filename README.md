@@ -12,7 +12,7 @@
 
 ### Установка
 
-Команда для клонирования репозитория
+Команда для клонирования репозитория:
 ```
 git clone https://github.com/dkulemin/dl_school_srgan_bot.git
 ```
