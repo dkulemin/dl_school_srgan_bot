@@ -1,7 +1,7 @@
 from io import BytesIO
 from PIL import Image
 from telegram import Update
-from telegram.ext import Application, ContextTypes, CommandHandler, MessageHandler, filters
+from telegram.ext import Updater, CallbackContext, CommandHandler, Filters, MessageHandler, BaseFilter
 from textwrap import dedent
 import cv2
 import numpy as np
@@ -10,8 +10,8 @@ from model import SuperResolution
 from utils import TG_TOKEN_PATH
 
 
-async def help_command(update: Application, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(
+def help_command(update: Update, context: CallbackContext):
+    update.message.reply_text(
         dedent("""\
             Бот может увеличить разрешение переданной картинки в 4 раза.
             Все что нужно сделать - отправить картинку без сжатия.
@@ -35,21 +35,25 @@ def _process_photo(photo: BytesIO) -> BytesIO:
     return bio
 
 
-async def echo_image(update: Application, context: ContextTypes.DEFAULT_TYPE) -> None:
-    photo_file = await context.bot.get_file(update.message.document.file_id)
+def echo_image(update: Update, context: CallbackContext) -> None:
+    photo_file = context.bot.get_file(update.message.document.file_id)
 
-    b_photo = BytesIO(await photo_file.download_as_bytearray())
+    b_photo = BytesIO(photo_file.download_as_bytearray())
 
-    await context.bot.send_document(chat_id=update.effective_chat.id, document=_process_photo(b_photo))
+    context.bot.send_document(chat_id=update.effective_chat.id, document=_process_photo(b_photo))
 
 
 def main() -> None:
-    application = Application.builder().token(TG_TOKEN_PATH.read_text()).build()
+    updater = Updater(TG_TOKEN_PATH.read_text())
 
-    application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(MessageHandler(filters.Document.IMAGE, echo_image))
+    updater.dispatcher.add_handler(CommandHandler("help", help_command))
+    updater.dispatcher.add_handler(MessageHandler(Filters.update.message & Filters.document, echo_image))
 
-    application.run_polling()
+    updater.start_polling()
+
+    print('Started')
+
+    updater.idle()
 
 
 if __name__ == "__main__":
