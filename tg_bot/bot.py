@@ -23,7 +23,7 @@ async def help_command(update: Application, context: ContextTypes.DEFAULT_TYPE):
 
 def _process_photo(photo: bytearray) -> Optional[BytesIO]:
     numpy_image = cv2.imdecode(np.frombuffer(BytesIO(photo).getvalue(), np.uint8), cv2.IMREAD_COLOR)
-    print(numpy_image.shape)
+
     if np.sum(numpy_image.shape[:-1]) < IMAGE_THRESHOLD:
         sr = SuperResolution()
         numpy_image = sr(numpy_image)
