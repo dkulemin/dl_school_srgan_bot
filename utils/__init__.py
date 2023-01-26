@@ -1,6 +1,11 @@
-from .constants import GENERATOR_PATH, TG_TOKEN_PATH
+from .constants import (
+    GENERATOR_PATH,
+    IMAGE_THRESHOLD,
+    TG_TOKEN_PATH,
+)
 
 __all__ = [
     'GENERATOR_PATH',
+    'IMAGE_THRESHOLD',
     'TG_TOKEN_PATH',
 ]
